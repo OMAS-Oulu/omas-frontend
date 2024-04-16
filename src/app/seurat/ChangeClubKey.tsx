@@ -1,36 +1,26 @@
-import { Button } from "@/components/ui/Button"
-import { joinClubURL } from "@/lib/APIConstants";
+'use client';
+import { Button } from "@/components/ui/Button";
+import { changeClubKeyURL } from "@/lib/APIConstants";
 import { User } from "@/types/commonTypes";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-interface JoinClubProps {
+interface ChangeClubKeyProps {
     clubName: string
 }
 
-const JoinClub = ({ clubName }: JoinClubProps) => {
+const ChangeClubKey = ({ clubName }: ChangeClubKeyProps) => {
     const [message, setMessage] = useState("");
     const [messageStyle, setMessageStyle] = useState("text-black");
-    const [user, setUser] = useState<User>();
-
-    const token = localStorage.getItem("token");
-
-    const handleProfileUpdate = (club: string) => {
-        const newUser: User = {
-            ...JSON.parse(localStorage.getItem("userInfo")!),
-            club: club
-        };
-        localStorage.setItem("userInfo", JSON.stringify(newUser));
-    }
 
     const handleSubmit = async (data: FormData) => {
         const pass = data.get("pass") || null;
         try {
             const res = await axios({
                 method: 'post',
-                url: joinClubURL,
+                url: changeClubKeyURL,
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
                     'Content-Type': 'application/json'
                 },
                 data: {
@@ -43,40 +33,34 @@ const JoinClub = ({ clubName }: JoinClubProps) => {
 
             if (res.status === 200) {
                 try {
-                    handleProfileUpdate(clubName);
-                    setMessage(`Seuraan ${clubName} liittyminen onnistui.`);
+                    setMessage(`Seuran ${clubName} salasanan vaihto onnistui.`);
                     setMessageStyle("text-black");
                 } catch (e: any) {
                     console.log(e);
                 }
             } else {
-                setMessage(`Seuraan ${clubName} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
+                setMessage(`Seuran ${clubName} salasanan vaihto epäonnistui.`);
                 setMessageStyle("text-red-500");
             }
         } catch (error) {
             console.log(error);
-            setMessage(`Seuraan ${clubName} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
+            setMessage(`Seuran ${clubName} salasanan vaihto epäonnistui.`);
             setMessageStyle("text-red-500");
         }
     }
 
     return (
         <div>
+            <h1>Aseta uusi salasana:</h1>
             <form
                 action={handleSubmit}
                 className='flex flex-col gap-2 max-w-[200px]'
             >
-                {/* <input
-                    className='border rounded-lg p-2'
-                    type="text"
-                    name="club"
-                    placeholder="seuran nimi"
-                /> */}
                 <input
                     className='border rounded-lg p-2'
                     type="password"
                     name="pass"
-                    placeholder="seuran salasana"
+                    placeholder="uusi salasana"
                 />
                 <Button
                     variant="outline"
@@ -84,7 +68,7 @@ const JoinClub = ({ clubName }: JoinClubProps) => {
                     className="hover:bg-slate-100"
                     type="submit"
                 >
-                    Liity seuraan
+                    Aseta salasana
                 </Button>
             </form>
             <p className={`${messageStyle} mt-3`}>{message}</p>
@@ -92,4 +76,4 @@ const JoinClub = ({ clubName }: JoinClubProps) => {
     )
 }
 
-export default JoinClub;
+export default ChangeClubKey;
