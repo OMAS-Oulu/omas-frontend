@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import axios from 'axios';
 import { getAdminDeleteUserUrl, getAdminDemoteUserUrl, getAdminPromoteUserUrl } from '@/lib/APIConstants';
-import AreYouSure from '@/app/admin/AreYouSure';
-import { AdminUser, Role } from '@/types/commonTypes';
+import { AdminUser } from '@/types/commonTypes';
 
 interface UserProps {
     user: AdminUser
@@ -13,8 +12,11 @@ const User = ({ user }: UserProps) => {
     const [message, setMessage] = useState("");
     const [messageStyle, setMessageStyle] = useState("text-black");
 
-    const roles = user.roles;
-    
+    const roles: string[] = [];
+    user.roles.map(role => {
+        roles.push(role.role);
+    })
+
     const handleSubmit = async (data: FormData) => {
         const role = data.get("role");
         if (data.get("promote")) {
@@ -122,10 +124,10 @@ const User = ({ user }: UserProps) => {
                 <h1>{`sähköposti: ${user.email}`}</h1>
                 <h1>{`luontipäivä: ${user.creationDate}`}</h1>
                 <h1>{`seura: ${user.partOfClub}`}</h1>
-                <div className='flex flex-row gap-2'>
-                    <h1>roolit:</h1>
-                    {roles.length !== 0 ? roles.map((role: Role, index: number) => (
-                        <p key={index}>{role.role}</p>
+                <h1>roolit:</h1>
+                <div className='flex flex-col ml-4'>
+                    {roles.length !== 0 ? roles.map((role: string, index: number) => (
+                        <p key={index}>{`-> ${role}`}</p>
                     )) : (
                         <p>ei rooleja</p>
                     )}
@@ -165,7 +167,6 @@ const User = ({ user }: UserProps) => {
                     </Button>
                 </form>
                 <p className={`${messageStyle} mt-3`}>{message}</p>
-                {/* <AreYouSure hidden={true} prompt={`Haluatko varmasti poistaa käyttäjän ${user.username}?`} onClickYes={1+1} /> */}
             </div>
         </div>
     )
