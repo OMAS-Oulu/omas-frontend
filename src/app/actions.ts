@@ -5,6 +5,7 @@ import {
   addTeamMemberURL,
   getFileUploadUrl,
 } from "@/lib/APIConstants";
+import jwt from 'jsonwebtoken';
 
 
 export async function sendScore(token: string, formData: FormData) {
@@ -113,4 +114,22 @@ export async function joinTeam(
     console.error(error);
     return { message: "Virhe joukkueeseen liittymisessä", status: 500 };
   }
+}
+
+
+
+/**
+ * Checks if a JWT token is expired without verifying its signature.
+ * @param token - The JWT token to check.
+ * @returns Returns true if the token is expired, false otherwise.
+ */
+export async function isJwtExpired(token: string) {
+  const { exp } = jwt.decode(token, { complete: true })?.payload as jwt.JwtPayload;
+
+  if (!exp) {
+      return true; // If exp unable to be parsed, assume expired
+  }
+  
+  const currentTime = Math.floor(Date.now() / 1000);
+  return exp < currentTime;
 }
