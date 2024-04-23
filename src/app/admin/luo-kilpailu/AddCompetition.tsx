@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { addCompetitionURL } from "../../lib/APIConstants";
+import { addCompetitionURL } from "../../../lib/APIConstants";
 import axios from "axios";
 import { Form, Formik } from "formik";
 import validationSchema from "./add-competition-validation";
@@ -10,10 +10,13 @@ import CustomDropdown from "@/components/ui/CustomDropdown";
 import { useRouter } from "next/navigation";
 import { PostCompetition } from "@/types/commonTypes";
 import { useState } from "react";
+import useUserInfo from "@/lib/hooks/get-user.info";
+import AdminNavbar from "../AdminNavbar";
 
 export default function AddCompetition() {
   const [message, setMessage] = useState("");
   const router = useRouter();
+  const { token } = useUserInfo();
 
   type CompetitionType = "rifle" | "pistol";
 
@@ -73,7 +76,8 @@ export default function AddCompetition() {
 
   return (
     <div className="p-4">
-      <h1>Tällä sivulla voit luoda uusia kilpailuja.</h1>
+      <AdminNavbar />
+      <h1 className="py-2">Tällä sivulla voit luoda uusia kilpailuja.</h1>
       <Formik
         id="addCompetitionForm"
         initialValues={initialValues}

@@ -3,7 +3,7 @@ import { CompetitionResponse, CompetitionTeamsResponse } from "@/types/commonTyp
 import { useEffect, useState } from "react";
 import { getCompetitionTeamsQueryUrl } from "@/lib/APIConstants";
 import axios from "axios";
-import Paginator from "../components/Paginator";
+import Paginator from "../../components/Paginator";
 import Team from "./Team";
 
 interface CompetitionProps {

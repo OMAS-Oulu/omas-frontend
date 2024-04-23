@@ -5,7 +5,13 @@ import {
   addTeamMemberURL,
   getFileUploadUrl,
 } from "@/lib/APIConstants";
-import jwt from 'jsonwebtoken';
+
+/**
+ * Send users score to the server
+ * @param token 
+ * @param formData 
+ * @returns returns status code 200 if successful, 400 if no auth header found, 500 if error
+ */
 
 
 export async function sendScore(token: string, formData: FormData) {
@@ -46,11 +52,18 @@ export async function sendScore(token: string, formData: FormData) {
   }
 }
 
-// upload image
-// POST api/file/upload/
-// Authorization: required
-// Content-Type: multipart/form-data
-// Requires competitionId field and file field for the image. Currently only accepts one image at a time.
+/**
+* upload image
+* POST api/file/upload/
+* Authorization: required
+* Content-Type: multipart/form-data
+* Requires competitionId field and file field for the image. Currently only accepts one image at a time.
+ * @param token 
+ * @param file 
+ * @param competitionId 
+ * @returns status code 200 if successful, 400 if no auth header found, 500 if error
+ */
+
 
 export async function uploadImage(
   token: string,
@@ -85,6 +98,14 @@ export async function uploadImage(
   }
 }
 
+/**
+ * Send request to server to join team
+ * @param token 
+ * @param teamName 
+ * @param competitionName 
+ * @returns returns status code 200 if successful, 400 if no auth header found, 500 if error
+ */
+
 export async function joinTeam(
   token: string,
   teamName: string,
@@ -104,32 +125,45 @@ export async function joinTeam(
       },
       body: JSON.stringify({ teamName: trimmedTeamName, competitionName: competitionName })
     });
-    const body = response.statusText;
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return { message: "Virhe joukkueeseen liittymisessä", status: response.status };
     }
 
     return { body: "Joukkueesen liittyminen onnistui", status: response.status };
   } catch (error: any) {
     console.error(error);
-    return { message: "Virhe joukkueeseen liittymisessä", status: 500 };
+    return { message: "Virhe joukkueeseen liittymisessä: ", status: 500 };
   }
 }
 
 
 
-/**
- * Checks if a JWT token is expired without verifying its signature.
- * @param token - The JWT token to check.
- * @returns Returns true if the token is expired, false otherwise.
- */
-export async function isJwtExpired(token: string) {
-  const { exp } = jwt.decode(token, { complete: true })?.payload as jwt.JwtPayload;
 
-  if (!exp) {
-      return true; // If exp unable to be parsed, assume expired
+
+/**
+ * Checks if the captcha token is valid
+ * @param captchaToken 
+ * @returns 
+ */
+
+export async function captchaValidation(captchaToken: string | null) {
+  try {
+    const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const body = await response.json();
+    return { body: body, status: response.status };
+  } catch (error: any) {
+    console.error(error);
+    throw new Error('Captchan todennus epäonnistui', error);
   }
-  
-  const currentTime = Math.floor(Date.now() / 1000);
-  return exp < currentTime;
 }

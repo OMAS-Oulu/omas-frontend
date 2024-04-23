@@ -4,10 +4,11 @@ import { CompetitionResponse, ImageProof, QueryCompetition } from "@/types/commo
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Images from "./Images";
-import Paginator from "../components/Paginator";
+import Paginator from "../../components/Paginator";
 import Competition from "./Competition";
 import Input from "@/components/ui/Input";
 import { stringToId } from "@/lib/functions";
+import AdminNavbar from "../AdminNavbar";
 
 const ImageViewer = () => {
     const [data, setData] = useState<QueryCompetition>();
@@ -49,8 +50,9 @@ const ImageViewer = () => {
 	}
 
     return (
-        <div className="mt-6">
+        <div className="p-4">
             <div className="flex flex-col gap-2">
+                <AdminNavbar />
                 <h1 className="text-xl">Hae kilpailua:</h1>
                 <Input
                     id="search"

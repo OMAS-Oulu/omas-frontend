@@ -5,10 +5,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface JoinClubProps {
-    clubName: string
+    id: string
 }
 
-const JoinClub = ({ clubName }: JoinClubProps) => {
+const JoinClub = ({ id }: JoinClubProps) => {
     const [message, setMessage] = useState("");
     const [messageStyle, setMessageStyle] = useState("text-black");
     const [user, setUser] = useState<User>();
@@ -34,7 +34,7 @@ const JoinClub = ({ clubName }: JoinClubProps) => {
                     'Content-Type': 'application/json'
                 },
                 data: {
-                    clubName: clubName,
+                    clubName: id,
                     passkey: pass
                 }
             });
@@ -43,19 +43,19 @@ const JoinClub = ({ clubName }: JoinClubProps) => {
 
             if (res.status === 200) {
                 try {
-                    handleProfileUpdate(clubName);
-                    setMessage(`Seuraan ${clubName} liittyminen onnistui.`);
+                    handleProfileUpdate(id);
+                    setMessage(`Seuraan ${id} liittyminen onnistui.`);
                     setMessageStyle("text-black");
                 } catch (e: any) {
                     console.log(e);
                 }
             } else {
-                setMessage(`Seuraan ${clubName} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
+                setMessage(`Seuraan ${id} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
                 setMessageStyle("text-red-500");
             }
         } catch (error) {
             console.log(error);
-            setMessage(`Seuraan ${clubName} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
+            setMessage(`Seuraan ${id} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
             setMessageStyle("text-red-500");
         }
     }

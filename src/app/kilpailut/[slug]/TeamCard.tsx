@@ -4,11 +4,43 @@ import { Button } from "@/components/ui/Button";
 import React, { Suspense, useEffect } from "react";
 import useIsLoggedIn from "@/lib/hooks/is-logged-in";
 import {TTeam,} from "@/types/commonTypes";
-import { joinTeam } from "@/app/actions";
 import useUserInfo from "@/lib/hooks/get-user.info";
+import { addTeamMemberURL } from "@/lib/APIConstants";
 
-export default function TeamCard({ team, memberOf, setIsMember }: { team: TTeam , memberOf: string | null, setIsMember: (teamName: string) => void}) {
+export async function joinTeam(
+    token: string,
+    teamName: string,
+    competitionName: string
+  ) {
+    const trimmedTeamName = teamName.trim();
+  
+    if (token == null) {
+      return { message: "Virheellinen käyttäjä", status: 400 };
+    }
+    try {
+      const response = await fetch(addTeamMemberURL, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ teamName: trimmedTeamName, competitionName: competitionName })
+      });
+  
+      if (!response.ok) {
+        return { message: "Virhe joukkueeseen liittymisessä", status: response.status };
+      }
+  
+      return { body: "Joukkueesen liittyminen onnistui", status: response.status };
+    } catch (error: any) {
+      console.error(error);
+      return { message: "Virhe joukkueeseen liittymisessä: ", status: 500 };
+    }
+  }
+
+export default function TeamCard({ team, memberOf, setIsMember, isPartOfClub }: { team: TTeam , memberOf: string | null, setIsMember: (teamName: string) => void, isPartOfClub: boolean} ) {
     const isLoggedIn = useIsLoggedIn();
+
     const [isFull , setIsFull] = React.useState<boolean>(false);
     const { token } = useUserInfo();
 
@@ -45,11 +77,10 @@ export default function TeamCard({ team, memberOf, setIsMember }: { team: TTeam 
                             onClick={() =>
                                 handleClick(team.teamName, team.competitionId)
                             }
-                            disabled={memberOf !== null || isFull}
+                            disabled={memberOf !== null || isFull || !isPartOfClub}
                         >
                             {memberOf === team.teamName
-                                ? "Olet joukkueessa"
-                                : isFull ? "Joukkue on täynnä" : "Liity joukkueeseen"}
+                                ? "Olet joukkueessa" : !isPartOfClub ? "Liity seuraan": isFull ? "Joukkue on täynnä" : "Liity joukkueeseen"}
                         </Button>
                     )}
                 </div>

@@ -1,7 +1,5 @@
 'use client';
 import React, { useEffect, useState } from "react";
-import ChangePassword from "./ChangePassword";
-import ChangeEmail from "./ChangeEmail";
 import UserDetails from "./UserDetails";
 
 export default function Settings() {

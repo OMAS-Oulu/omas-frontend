@@ -1,20 +1,24 @@
 import { Button } from "@/components/ui/Button";
 import { addClubURL } from "@/lib/APIConstants";
+import useUserInfo from "@/lib/hooks/get-user.info";
 import axios from "axios";
 import { useState } from "react";
+import AdminNavbar from "../AdminNavbar";
 
 const CreateClub = () => {
     const [message, setMessage] = useState("");
     const [messageStyle, setMessageStyle] = useState("text-black");
+    const { token } = useUserInfo();
 
     const handleSubmit = async (data: FormData) => {
         const clubName = data.get("club");
+        
         try {
             const res = await axios({
                 method: 'post',
                 url: addClubURL,
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 data: {
@@ -38,8 +42,9 @@ const CreateClub = () => {
     }
 
     return (
-        <div>
-            <div className="p-4">
+        <div className="p-4">
+            <AdminNavbar />
+            <div className="py-2">
                 <p className="text-md">Tällä sivulla voit luoda uusia seuroja.</p>
             </div>
             <div className="flex items-center gap-2 mt-4 p-4 w-full border-solid border border-slate-300 rounded-lg shadow-md cursor-pointer">

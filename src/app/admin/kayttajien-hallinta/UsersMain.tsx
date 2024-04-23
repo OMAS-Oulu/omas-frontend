@@ -2,15 +2,18 @@
 import { getAdminUserQueryUrl } from "@/lib/APIConstants";
 import { AdminQueryUser } from '@/types/commonTypes';
 import React, { useEffect, useState } from "react";
-import Paginator from "../components/Paginator";
+import Paginator from "../../components/Paginator";
 import Input from "@/components/ui/Input";
 import axios from "axios";
 import Users from "./Users";
+import useUserInfo from "@/lib/hooks/get-user.info";
+import AdminNavbar from "../AdminNavbar";
 
 const UsersMain = () => {
     const [data, setData] = useState<AdminQueryUser>();
     const [pageNumber, setPageNumber] = useState(0);
     const [search, setSearch] = useState("");
+    const { token } = useUserInfo();
 
     let apiUrl = getAdminUserQueryUrl(search, pageNumber, 10);
 
@@ -18,12 +21,10 @@ const UsersMain = () => {
         try {
             const res = await axios.get(apiUrl, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(localStorage.getItem("token"));
-            console.log(res);
             setData(res.data);
         } catch (e: any) {
             console.error(e);
@@ -37,16 +38,17 @@ const UsersMain = () => {
     }
 
     useEffect(() => {
-        fetchUsers();
-    }, [pageNumber, search]);
+        if (token) fetchUsers();
+    }, [pageNumber, search, token]);
 
     useEffect(() => {
         setPageNumber(0);
     }, [search]);
 
     return (
-        <div>
-            <div className="p-4">
+        <div className="p-4">
+            <AdminNavbar />
+            <div className="py-2">
                 <p className="text-md">Tällä sivulla voit hallinnoida käyttäjiä, voit muokata heidän rooleja sekä poistaa käyttäjiä</p>
                 <p className="text-md">Tiedot päivittyvät sivun päivittämisen jälkeen.</p>
                 <p className="text-md">Etsiminen tapahtuu koko nimen (etunimi ja sukunimi) perusteella.</p>

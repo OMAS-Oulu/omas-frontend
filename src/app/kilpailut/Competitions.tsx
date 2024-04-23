@@ -8,24 +8,42 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
+import Paginator from "../components/Paginator";
 
 export default function Competitions() {
   const [competitions, setCompetitions] = useState<CompetitionResponse[]>([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPage] = useState(0);
 
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchData() {
-      const competitions = await axios.get(getCompetitionsQueryUrl(search, 0), {
+  async function fetchData() {
+    const competitions = await axios.get(
+      getCompetitionsQueryUrl(search, page),
+      {
         headers: {
           "Content-Type": "application/json",
         },
-      });
-      setCompetitions(competitions.data.content);
-    }
+      }
+    );
+    setCompetitions(competitions.data.content);
+    setTotalPage(competitions.data.totalPages);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, [page]);
+
+  useEffect(() => {
+    setPage(0);
     fetchData();
   }, [search]);
+
+  const handlePageNumberChange = (page: number) => {
+    if (page < 0 || page > totalPages - 1) return;
+    setPage(page);
+  };
 
   return (
     <div className="flex flex-col py-5">
@@ -51,6 +69,11 @@ export default function Competitions() {
             </p>
           </Link>
         ))}
+      <Paginator
+        pageNumber={page}
+        totalPages={totalPages}
+        handlePageNumberChange={handlePageNumberChange}
+      />
     </div>
   );
 }

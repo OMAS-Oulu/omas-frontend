@@ -4,15 +4,9 @@ import { isJwtExpired } from "@/app/actions";
 import { useEffect, useState } from "react";
 
 /**
- * Hook to get user information from local storage.
- * it checks if the JWT token is expired and clears the local storage if it is.
- * @returns Returns an object containing user information.
+ * Hook to get user info from local storage
+ * @returns Record<string, any>
  */
-
-async function checkJWTExpiry() {
-    const expired = await isJwtExpired(localStorage.getItem('token') || '');
-    return expired;
-}
 
 const useUserInfo = () => {
     const [storage, setStorage] = useState<Record<string, any>>({});

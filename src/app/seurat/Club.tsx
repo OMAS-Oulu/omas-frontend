@@ -1,47 +1,50 @@
 import JoinClub from "./JoinClub";
 import ChangeClubKey from "./ChangeClubKey";
 import { useEffect, useState } from "react";
-import { User } from "@/types/commonTypes";
+import { ClubResponse, User } from "@/types/commonTypes";
 import { formatDate } from "@/lib/utils";
+import useUserInfo from "@/lib/hooks/get-user.info";
 
 interface ClubProps {
-  displayName: string;
-  id: string;
-  creationDate: string;
+    club: ClubResponse,
+    clubAdminRoles: string[]
 }
 
-const Club = ({displayName, id, creationDate}: ClubProps) => {
-    const [clubAdmin, setClubAdmin] = useState<User | null>(null);
-    const [token, setToken] = useState("");
+const Club = ({ club, clubAdminRoles }: ClubProps) => {
+    // const [clubAdmin, setClubAdmin] = useState<User | null>(null);
+    // const [user, setUser] = useState<User>();
+    const { token } = useUserInfo();
 
-    const getUser = () => {
-        const token = localStorage.getItem("token");
-        try {
-            if (token) {
-                setToken(token);
-                const user: User = JSON.parse(localStorage.getItem("userInfo")!);
-                if (user.roles.includes(`${id}/admin`)) setClubAdmin(user);
-            }
-        } catch (e: any) {
-            console.log(e);
-        }
+    // const getUser = () => {
+    //     try {
+    //         const user: User = JSON.parse(localStorage.getItem("userInfo")!);
+    //         setUser(user);
+    //         if (user.roles.includes(`${club.nameNonId}/admin`)) setClubAdmin(user);
+    //     } catch (e: any) {
+    //         console.log(e);
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     getUser();
+    // }, [club])
+
+    // console.log(user, clubAdmin);
+
+    if (clubAdminRoles) {
+        console.log(clubAdminRoles);
+        console.log(club.name, clubAdminRoles.includes(club.name));
     }
-
-    useEffect(() => {
-        getUser();
-    }, [])
-
 
     return (
         <div className="shadow p-2">
             <div>
-                <p className="text-xl">{displayName}</p>
-                <p className="text-slate-700">Seura luotu: {formatDate(creationDate)}</p>
+                <p className="text-xl">{club.nameNonId}</p>
+                <p className="text-slate-700">Seura luotu: {formatDate(club.creationDate)}</p>
             </div>
             <div>
-			    <JoinClub clubName={id} />
-                <ChangeClubKey clubName={id} />
-                {/* { (clubAdmin) ? <ChangeClubKey clubName={id} /> : <div></div> } */}
+			    <JoinClub id={club.name} />
+                { (clubAdminRoles && clubAdminRoles.includes(club.name)) ? <ChangeClubKey token={token} clubName={club.name} /> : null }
             </div>
         </div>
     )
