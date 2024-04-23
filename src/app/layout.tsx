@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     description: "Ilmapistooli- ja kivääriammunnan tulospalvelu",
 };
 
+
+
 export default function RootLayout({
     children,
 }: Readonly<{

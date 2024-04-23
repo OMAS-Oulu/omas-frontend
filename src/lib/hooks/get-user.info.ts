@@ -9,8 +9,10 @@ import { useEffect, useState } from "react";
  * @returns Returns an object containing user information.
  */
 
-async function checkJWTExpiry() {
+export async function checkJWTExpiry() {
     const expired = await isJwtExpired(localStorage.getItem('token') || '');
+    localStorage.clear();
+    window.dispatchEvent(new Event('localStorageChange'));
     return expired;
 }
 
@@ -21,7 +23,6 @@ const useUserInfo = () => {
         (async () => {
             const expired = await checkJWTExpiry();
             if (expired) {
-                localStorage.clear();
                 setStorage({});
             } else {
                 const allStorage = Object.keys(localStorage).reduce((obj, str) => {

@@ -124,6 +124,11 @@ export async function joinTeam(
  * @returns Returns true if the token is expired, false otherwise.
  */
 export async function isJwtExpired(token: string) {
+  // If no token is provided, return false (not expired) as to not remove user data that doesnt even exist
+  console.log(token);
+  if (!token) {
+    return false;
+  }
   const { exp } = jwt.decode(token, { complete: true })?.payload as jwt.JwtPayload;
 
   if (!exp) {
@@ -131,5 +136,6 @@ export async function isJwtExpired(token: string) {
   }
   
   const currentTime = Math.floor(Date.now() / 1000);
+  console.log(exp < currentTime)
   return exp < currentTime;
 }
