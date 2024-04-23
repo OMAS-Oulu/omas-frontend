@@ -20,25 +20,21 @@ export default function ScoreCard({
   competitions,
 }: {
   scoreType: ScoreType;
-  competitions: UsersCompetition[] | null;
+  competitions: UsersCompetition[];
 }) {
   const round = { bullseyes: 10, score: 10.9 };
   const total = { bullseyes: 60, score: 654 };
   const scoreValue = scoreType === "update" ? round : total;
   const [message, setMessage] = React.useState<PostReturn | null>(null);
   const [teamName, setTeamName] = React.useState<string | null>(null);
-  let competitionNames: any[] = ["none"];
-  if (competitions != null) {
-    competitionNames = competitions.map(
-      (competition) => competition.competitionId
-    );
-    
-  }
+  const competitionNames = competitions.map(
+    (competition) => competition.competitionId
+  );
   const { token } = useUserInfo();
   const [resetUploadKey, setResetUploadKey] = useState(0); // A key used to trigger a reset
 
   function handleDropDownChange(competitionName: string) {
-    const foundCompetition = competitions?.find(
+    const foundCompetition = competitions.find(
       (competition) => competition.competitionId === competitionName
     );
     if (foundCompetition) {

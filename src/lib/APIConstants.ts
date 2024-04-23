@@ -104,7 +104,7 @@ export const getTeamMembersURL = (teamName: string, competitionId: string) => {
 
 export const getForgotPasswordUrl = () => {
   return `${baseURL}api/forgot_password`;
-};
+}
 export const getResetPasswordUrl = (token: string, newPassword: string) => {
   return `${baseURL}api/reset_password?token=${token}&password=${newPassword}`;
 };
@@ -113,42 +113,39 @@ export const getAdminUserQueryUrl = (
   search: string = "",
   page: number,
   size: number = 10
-) => {
-  return `${baseURL}api/admin/user/query?search=${search}&page=${page}&size=${size}`;
+  ) => {
+  return `${baseURL}api/admin/user/query?search=${search}&page=${page}&size=${size}`
 };
 
 export const getAdminPromoteUserUrl = () => {
   return `${baseURL}api/admin/promote`;
-};
+}
 
 export const getAdminDemoteUserUrl = () => {
   return `${baseURL}api/admin/demote`;
-};
+}
 
 export const getAdminDeleteUserUrl = () => {
   return `${baseURL}api/admin/delete`;
-};
+}
 
 export const getFileDownloadUrl = () => {
   return `${baseURL}api/file/download`;
-};
+}
 
 export const getFileUploadUrl = () => {
   return `${baseURL}api/file/upload`;
-};
+}
 
 export const getUpdatePasswordUrl = () => {
   return `${baseURL}api/updatePassword`;
-};
+}
 
 export const getUpdateEmailUrl = () => {
   return `${baseURL}api/updateEmail`;
-};
+}
 
-/**
- * Gets users teams
- * @returns 
- */
+//Get all users competitions and teams
 
 export const getUserCompetitions = () => {
   return `${baseURL}api/user/teams`;
@@ -170,12 +167,4 @@ export const getUpcomingCompetitions = (
   size: number = 10
 ) => {
   return `${baseURL}${comp}/upcoming/query?page=${page}&size=${size}`;
-};
-
-export const getActiveTeams = (
-  club?: string,
-  page: number = 0,
-  size: number = 10
-) => {
-  return `${baseURL}${comp}/team/active/query?club=${club}&page=${page}&size=${size}`;
 };

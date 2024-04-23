@@ -272,7 +272,3 @@ export type TeamMember = {
   teamName: string,
   legalName: string
 }
-
-export interface CaptchaPostBody {
-  captchaToken: string;
-}

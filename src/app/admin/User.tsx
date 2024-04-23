@@ -4,7 +4,6 @@ import axios from 'axios';
 import { getAdminDeleteUserUrl, getAdminDemoteUserUrl, getAdminPromoteUserUrl } from '@/lib/APIConstants';
 import { AdminUser } from '@/types/commonTypes';
 import { formatDate } from "@/lib/utils";
-import useUserInfo from '@/lib/hooks/get-user.info';
 
 interface UserProps {
   user: AdminUser;
@@ -13,7 +12,6 @@ interface UserProps {
 const User = ({ user }: UserProps) => {
   const [message, setMessage] = useState("");
   const [messageStyle, setMessageStyle] = useState("text-black");
-  const { token } = useUserInfo();
 
   const roles: string[] = [];
   user.roles.map(role => {
@@ -28,7 +26,7 @@ const User = ({ user }: UserProps) => {
           method: "post",
           url: getAdminPromoteUserUrl(),
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
           data: {
@@ -56,7 +54,7 @@ const User = ({ user }: UserProps) => {
           method: "post",
           url: getAdminDemoteUserUrl(),
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
           data: {
@@ -88,7 +86,7 @@ const User = ({ user }: UserProps) => {
           method: "delete",
           url: getAdminDeleteUserUrl(),
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
           data: {

@@ -1,40 +1,21 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { addClubURL, joinClubURL, loginURL } from "../../lib/APIConstants";
+import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createRef, useState } from "react";
 import { Form, Formik } from "formik";
 import validationSchema from "./validation";
-import CustomInput from "@/components/ui/CustomInput";
-import ReCAPTCHA from "react-google-recaptcha";
-import { captchaValidation } from "../actions";
-import { registrationURL } from "@/lib/APIConstants";
-import { sendLogin } from "@/lib/utils";
 
-export async function sendRegister(values: any) {
-  try {
-    const response = await fetch(`${registrationURL}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: values.username,
-        name: values.name,
-        password: values.password,
-        email: values.email,
-      }),
-    });
-    return response;
-  } catch (error: any) {
-    console.error(error);
-    return error;
-  }
-}
+import CustomInput from "@/components/ui/CustomInput";
+import JoinClub from "../kilpailut/liitySeuraan/JoinClub";
+import ReCAPTCHA from "react-google-recaptcha";
+import { captchaResponse } from "@/types/commonTypes";
 
 export default function RegisterForm() {
-  const [message, setMessage] = useState<string | null>();
+  const [message, setMessage] = useState("");
   const reCaptchaRef = createRef<ReCAPTCHA>();
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const initialValues = {
@@ -45,47 +26,86 @@ export default function RegisterForm() {
   };
   const router = useRouter();
 
-  const [errorMessage, setErrorMessage] = useState<string | null>();
+  const url = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = "api/reg";
 
-  const handleRegister = async (values: any) => {
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const postRegister = async (values: any) => {
+    console.log(values);
+    setErrorMessage("");
+    const payload = values;
     try {
-      const captchaRes = await captchaValidation(captchaToken);
-      const success = captchaRes.body.success;
+      const captchaRes: captchaResponse = await handleReCaptchaSubmit(
+        captchaToken
+      );
 
-      if (!success) {
-          setMessage("Muista reCAPTCHA.");
-          reCaptchaRef?.current?.reset();
-          return;
-      }
+      if (captchaRes.success) {
+        const response = await fetch(`${url + endpoint}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        console.log(data);
+        if (response.ok) {
+          console.log(response.status);
+          try {
+            const response = await axios.post(loginURL, {
+              username: values.username,
+              password: values.password,
+            });
 
-      const response  = await sendRegister(values);
+            console.log("login success");
+            console.log(response.data.user);
 
-        if (response.status === 200) {
-            setMessage("Rekisteröityminen onnistui.")
+            let token = response.data.token;
+            let userInfo = response.data.user;
 
-            const response = await sendLogin(values.username, values.password);
-            const body = await response.json();
-            if (response.status === 200) {
-              const token = body.token;
-              const userInfo = body.user;
-  
-              localStorage.setItem("token", token);
-              localStorage.setItem("userInfo", JSON.stringify(userInfo));
-              window.dispatchEvent(new Event("localStorageChange"));
-              router.push("/");
+            localStorage.setItem("token", token);
+            localStorage.setItem("userInfo", JSON.stringify(userInfo));
+            window.dispatchEvent(new Event("localStorageChange"));
+            router.push("/");
+          } catch (error: any) {
+            if (error.response.data) {
+              console.log(error.response.data);
             }
-          } else {
-            setErrorMessage(`Rekisteröityminen epäonnistui.`);
+          } finally {
+            reCaptchaRef?.current?.reset();
           }
+        } else {
+          setMessage(
+            "Rekisteröinti ei onnistunut. Tarkista, että syöttämäsi tiedot ovat oikein."
+          );
+          setErrorMessage(data.message);
+          router.push("/kirjaudu");
+        }
+      } else {
+        setMessage("Muista reCAPTCHA.");
+      }
     } catch (error) {
-      console.error(error);
-    } finally {
-      reCaptchaRef?.current?.reset();
-  }
+      console.log(error);
+    }
   };
 
   const onReCAPTCHAChange = async (captchaToken: string | null) => {
     setCaptchaToken(captchaToken);
+  };
+
+  const handleReCaptchaSubmit = async (captchaToken: string | null) => {
+    const resCaptcha = await axios({
+      method: "POST",
+      url: "rekisteroidy/api",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        captchaToken: captchaToken,
+      },
+    });
+    return resCaptcha.data.body;
   };
 
   return (
@@ -95,7 +115,7 @@ export default function RegisterForm() {
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(true);
-        handleRegister(values);
+        postRegister(values);
         setSubmitting(false);
       }}
     >
@@ -144,7 +164,6 @@ export default function RegisterForm() {
               placeholder="Salasana uudelleen"
             />
             <ReCAPTCHA
-              ref={reCaptchaRef}
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
               onChange={onReCAPTCHAChange}
             />

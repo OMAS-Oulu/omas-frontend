@@ -1,5 +1,8 @@
 import React from "react";
 import Competitions from "./Competitions";
+import { Button } from "@/components/ui/Button";
+import Link from "next/link";
+import { CompetitionResponse } from "@/types/commonTypes";
 
 export default function LisääKilpailu() {
   return (

@@ -5,10 +5,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface JoinClubProps {
-    id: string
+    clubName: string
 }
 
-const JoinClub = ({ id }: JoinClubProps) => {
+const JoinClub = ({ clubName }: JoinClubProps) => {
     const [message, setMessage] = useState("");
     const [messageStyle, setMessageStyle] = useState("text-black");
     const [user, setUser] = useState<User>();
@@ -34,7 +34,7 @@ const JoinClub = ({ id }: JoinClubProps) => {
                     'Content-Type': 'application/json'
                 },
                 data: {
-                    clubName: id,
+                    clubName: clubName,
                     passkey: pass
                 }
             });
@@ -43,19 +43,19 @@ const JoinClub = ({ id }: JoinClubProps) => {
 
             if (res.status === 200) {
                 try {
-                    handleProfileUpdate(id);
-                    setMessage(`Seuraan ${id} liittyminen onnistui.`);
+                    handleProfileUpdate(clubName);
+                    setMessage(`Seuraan ${clubName} liittyminen onnistui.`);
                     setMessageStyle("text-black");
                 } catch (e: any) {
                     console.log(e);
                 }
             } else {
-                setMessage(`Seuraan ${id} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
+                setMessage(`Seuraan ${clubName} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
                 setMessageStyle("text-red-500");
             }
         } catch (error) {
             console.log(error);
-            setMessage(`Seuraan ${id} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
+            setMessage(`Seuraan ${clubName} liittyminen epäonnistui. Tarkista, että seuran nimi sekä salasana ovat oikein ja yritä uudelleen. Salasanaa ei tarvitse syöttää, jos seura ei sitä vaadi.`);
             setMessageStyle("text-red-500");
         }
     }
