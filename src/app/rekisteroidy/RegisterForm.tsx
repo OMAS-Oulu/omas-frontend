@@ -12,7 +12,31 @@ import validationSchema from "./validation";
 import CustomInput from "@/components/ui/CustomInput";
 import JoinClub from "../kilpailut/liitySeuraan/JoinClub";
 import ReCAPTCHA from "react-google-recaptcha";
-import { captchaResponse } from "@/types/commonTypes";
+import { captchaValidation } from "../actions";
+import { registrationURL } from "@/lib/APIConstants";
+import { sendLogin } from "@/lib/utils";
+
+export async function sendRegister(values: any) {
+  try {
+    const response = await fetch(`${registrationURL}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: values.username,
+        name: values.name,
+        password: values.password,
+        email: values.email,
+      }),
+    });
+    return response;
+    console.log(response);
+  } catch (error: any) {
+    console.error(error);
+    return error;
+  }
+}
 
 export default function RegisterForm() {
   const [message, setMessage] = useState("");

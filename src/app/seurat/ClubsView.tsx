@@ -7,25 +7,23 @@ import { ClubResponse, QueryClub } from '@/types/commonTypes';
 import Paginator from '../components/Paginator';
 import Input from '@/components/ui/Input';
 import Club from './Club';
-import { useRouter } from 'next/navigation';
 
 const ClubsView = () => {
 	const [data, setData] = useState<QueryClub>();
 	const [pageNumber, setPageNumber] = useState(0);
 	const [search, setSearch] = useState("");
+    const [clubAdminRoles, setClubAdminRoles] = useState<string[]>([]);
 
-    const router = useRouter();
-	
 	let apiUrl = getClubQueryUrl(search, pageNumber, 10);
 
 	const fetchClubs = async () => {
 		try {
 			const res = await axios.get(apiUrl, {
 				headers: {
-					'Authorization': `Bearer ${localStorage.getItem("token")}`,
 					'Content-Type': 'application/json'
 				}
 			});
+			console.log(res);
 			setData(res.data);
 		} catch (e: any) {
 			console.error(e);
@@ -46,7 +44,28 @@ const ClubsView = () => {
 		setPageNumber(0);
 	}, [search]);
 
-	if (!useIsLoggedIn || !data) return (
+	useEffect(() => {
+		try {
+
+			if (localStorage.getItem("userInfo") === null) {
+				return
+			}
+			const user: any = JSON.parse(localStorage.getItem("userInfo")!);
+			const roles = user.roles.replace(/\[|\]/g,'').split(',');
+			let clubAdminRoles: string[] = [];
+			roles.forEach((role: string) => {
+				console.log(role);
+				if (role.endsWith("/admin")) {
+					clubAdminRoles.push(role.replace("/admin", "").replace(" ", ""));
+				}
+			})
+			setClubAdminRoles(clubAdminRoles);
+		} catch (e: any) {
+			console.log(e);
+		}
+	}, [])
+	
+	if (!useIsLoggedIn()) return (
 		<main className="flex min-h-screen flex-col sm:items-center p-4 gap-2">
 			<h1 className='text-4xl'>Seurat</h1>
 			<p className='text-md'>Kirjaudu sisään tarkastellaksesi ja liittyäksesi seuraan.</p>

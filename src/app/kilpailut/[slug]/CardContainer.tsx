@@ -8,17 +8,31 @@ import {
 import TeamCard from "./TeamCard";
 import useUserInfo from "@/lib/hooks/get-user.info";
 import { useEffect, useState } from "react";
+import * as Q from "@/lib/APIConstants";
 
-async function getUserCompetitions(slug: string, token: any) {
-        const response = await fetch(`/kilpailut/${slug}/api/competition`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token,
-            },
-        });
-        return response;
-}
+async function getUserCompetitions(token: any) {
+    try {
+      const response = await fetch(Q.getUserCompetitions(), {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        return null;
+      }
+  
+      const data = await response.json();
+      console.log("jee: ",data);
+      return data;
+    } catch (error: any) {
+      console.error(error);
+      return null;
+    }
+  }
+
 
 export default function CardContainer({
     teams,
@@ -32,23 +46,34 @@ export default function CardContainer({
     const [competitions, setCompetitions] = useState<UsersCompetition[]>();
     const { token } = useUserInfo();
     const [memberOf, setIsMemberOf] = useState<string | null>(null);
-
-    // Fetch user's competitions
+    const user = useUserInfo();
+    const [isPartOfClub, setIsPartOfClub] = useState(false);
     useEffect(() => {
-        if (token == null) {
-            return;
+        if (user.userInfo != null) {
+            setIsPartOfClub(user.userInfo.club != null);
         }
+    }, [user]);
 
-        getUserCompetitions(slug, token).then((response) => {
-            response.json().then((data) => {
-                if (data.status === 200) {
-                    setCompetitions(data.body);
-                }
-            });
-        });
-    }, [token, slug]);
+  // Fetch user's competitions
+  useEffect(() => {
+    const fetchCompetitions = async () => {
+      if (token == null || !isPartOfClub) {
+        return;
+      }
+
+      const data = await getUserCompetitions(token);
+      console.log("data", data);
+      if (data) {
+        setCompetitions(data);
+
+      }
+    };
+
+    fetchCompetitions();
+  }, [token, slug, isPartOfClub]);
+
+
     // Check if user is member of any team
-
     useEffect(() => {
         if (competitions != null) {
             const memberOf = competitions.find(
@@ -56,6 +81,7 @@ export default function CardContainer({
             );
             memberOf ? setIsMemberOf(memberOf.teamName) : setIsMemberOf(null);
         }
+        console.log("comp ",competitions);
     }, [competitions, competition]);
 
     return (

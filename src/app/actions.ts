@@ -13,7 +13,7 @@ export async function sendScore(token: string, formData: FormData) {
 
   if (token == null) {
     console.error("No auth header found in request.");
-    return 500;
+    return { message: "Virheellinen käyttäjä", status: 400 };
   }
   try {
     const response = await fetch(addScoreSum, {
@@ -31,18 +31,17 @@ export async function sendScore(token: string, formData: FormData) {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const body = await response.json();
+    console.log(body);
 
     images.forEach((image) => {
       uploadImage(token, image, formData.get("competitionName")?.toString()!);
     });
 
-    return 200;
+    return { body: body, status: response.status };
   } catch (error: any) {
     console.log(error);
-    return 500;
+    return { message: "Virhe tuloksen lähetyksessä", status: 500 };
   }
 }
 

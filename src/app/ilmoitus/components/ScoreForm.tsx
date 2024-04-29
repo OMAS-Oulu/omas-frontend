@@ -5,14 +5,11 @@ import Custominput from "@/components/ui/CustomInput";
 import Dropdown from "@/components/ui/Dropdown";
 import { ScoreType, UsersCompetition } from "@/types/commonTypes";
 import UploadFile from "./UploadFile";
-import Notification from "@/components/component/Notification";
 import { sendScore } from "@/app/actions";
 import useUserInfo from "@/lib/hooks/get-user.info";
-import { formatDate } from "@/lib/utils";
 
 interface PostReturn {
   message: string;
-  status: number;
 }
 
 export default function ScoreCard({
@@ -45,10 +42,7 @@ export default function ScoreCard({
   return (
     <div>
       {message && (
-        <Notification
-          message={message.message + " : " + formatDate(new Date())}
-          type={message.status === 200 ? "success" : "error"}
-        />
+        <p>{message.message}</p>
       )}
 
       <Formik
@@ -91,14 +85,13 @@ export default function ScoreCard({
             resetForm();
             setResetUploadKey((prevKey) => prevKey + 1);
             setTeamName(null);
-            response === 200
+            console.log(response);
+            response.status === 200
               ? setMessage({
                   message: "Ilmoitus lähetetty",
-                  status: 200,
                 })
               : setMessage({
-                  message: "Ilmoituksen lähetys epäonnistui",
-                  status: 500,
+                  message: "Ilmoituksen lähetys epäonnistui: " + response.body.message,
                 });
           });
         }}

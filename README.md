@@ -4,7 +4,7 @@
 
 ### 2. Create .env or .env.local file in the project root with the following content:
 ```
-NEXT_PUBLIC_API_URL=https://localhost:8080/
+NEXT_PUBLIC_API_URL=https://localhost:8080/ #the backend url
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=
 RECAPTCHA_SECRET_KEY=
 ```
@@ -49,3 +49,17 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Deploy with Docker
+
+### 1. Build the Docker image
+```bash
+docker build -t omas-frontend .
+```
+
+### 2. Run the Docker container
+```bash
+docker run -p 3000:3000 omas-frontend
+```
+
+Deploy on your server or cloud provider.

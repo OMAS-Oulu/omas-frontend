@@ -10,27 +10,15 @@ interface ClubProps {
   creationDate: string;
 }
 
-const Club = ({displayName, id, creationDate}: ClubProps) => {
-    const [clubAdmin, setClubAdmin] = useState<User | null>(null);
-    const [token, setToken] = useState("");
+const Club = ({ club, clubAdminRoles }: ClubProps) => {
+    const { token } = useUserInfo();
 
-    const getUser = () => {
-        const token = localStorage.getItem("token");
-        try {
-            if (token) {
-                setToken(token);
-                const user: User = JSON.parse(localStorage.getItem("userInfo")!);
-                if (user.roles.includes(`${id}/admin`)) setClubAdmin(user);
-            }
-        } catch (e: any) {
-            console.log(e);
-        }
+
+
+    if (clubAdminRoles) {
+        console.log(clubAdminRoles);
+        console.log(club.name, clubAdminRoles.includes(club.name));
     }
-
-    useEffect(() => {
-        getUser();
-    }, [])
-
 
     return (
         <div className="shadow p-2">

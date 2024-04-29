@@ -12,6 +12,7 @@ import get from "@/api/get";
 import JoinClubTip from "./components/JoinClubTip";
 import UpcomingCompetitions from "./components/UpcomingCompetitions";
 import CurrentCompetitions from "./components/CurrentCompetitions";
+import getWithAuth from "@/api/getWithAuth";
 
 export type competitionListProps = {
   competitions: CompetitionResponse[];
@@ -47,13 +48,15 @@ export default function Home() {
         let currentCompetitions: CompetitionResponse[] = [];
         let ownCompetitionIds: string[] = [];
 
-        const response2 = await get(getUserCompetitions());
+        const response2 = await getWithAuth(getUserCompetitions(), tokenString);
         if (response2) {
-          const ownCompetitionsData = response2;
-          if (ownCompetitionsData) {
-            ownCompetitionsData.forEach((competition: CompetitionResponse) => {
-              ownCompetitionIds.push(competition.competitionId);
-            });
+          const ownCompetitionIdsData = response2;
+          if (ownCompetitionIdsData) {
+            ownCompetitionIdsData.forEach(
+              (competition: CompetitionResponse) => {
+                ownCompetitionIds.push(competition.competitionId);
+              }
+            );
           }
         }
 
