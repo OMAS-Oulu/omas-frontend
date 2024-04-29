@@ -6,7 +6,6 @@ import { CompetitionResponse } from "@/types/commonTypes";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
-import Paginator from "../components/Paginator";
 import fetchData from "@/api/get";
 
 
